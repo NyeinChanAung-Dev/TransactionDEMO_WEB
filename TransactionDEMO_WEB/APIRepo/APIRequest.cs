@@ -13,7 +13,7 @@ namespace TransactionDEMO_WEB.APIRepo
     public class APIRequest<T>
     {
         #region Base API
-        public const string APIKeyToCheck = "B93979A51C8C46712DD2C8271587B262";
+        public const string APIKeyToCheck = "G93979A51C8C46712DD2C8271587B262";
         private static string BaseUrl = "https://localhost:44387/";
 
         public static async Task<T> Get(string url)
