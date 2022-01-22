@@ -3,50 +3,49 @@
 
 <div class="page-header">
     <div class="m-t-10s">
-        <button class="btn btn-success btn-xs text-center rounded-pill m-r-5" onclick="AddEVoucher()">
-            <i class="anticon anticon-plus"></i> Create new EVoucher
+        <button class="btn btn-success btn-xs text-center rounded-pill m-r-5" onclick="UploadModal()">
+            <i class="anticon anticon-plus"></i> Import CSV or XML
         </button>
     </div>
 </div>
 
-<div class="container-fixed-sm" id="eVoucherList">
+<div class="container-fixed-sm" id="transactionList">
 
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="eVoucherDetailForm">
+<div class="modal fade" id="uploadModal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="avatar avatar-cyan avatar-icon avatar-square">
-                    <i class="anticon anticon-layout" style="font-size: 25px;"></i>
+                    <i class="anticon anticon-file" style="font-size: 25px;"></i>
                 </div>
-                <h5 class="modal-title m-10" id="exampleModalLabel">EVoucher Detail</h5>
+                <h5 class="modal-title m-10" id="exampleModalLabel">Import file</h5>
                 <button type="button" class="close" data-dismiss="modal">
                     <i class="text-danger anticon anticon-close-circle"></i>
                 </button>
             </div>
             <div id="formmodal" class="modal-body">
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade bd-example-modal-lg" id="eVoucherUpSert">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="avatar avatar-cyan avatar-icon avatar-square">
-                    <i class="anticon anticon-layout" style="font-size: 25px;"></i>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Sample CSV file</label>
+                    <div class="col-sm-6 col-form-label">
+                        <a href="~/assets/sample/SampleCSV.csv">SampleCSV.csv</a>
+                    </div>
                 </div>
-                <h5 class="modal-title m-10" id="exampleModalLabel">Create EVoucher New</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <i class="text-danger anticon anticon-close-circle"></i>
-                </button>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Sample XML file</label>
+                    <div class="col-sm-6 col-form-label">
+                        <a target="_blank" href="~/assets/sample/SampleXML.xml">SampleXML.xml</a>
+                    </div>
+                </div>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="customFile">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                </div>
             </div>
-            <div id="formmodalNEW" class="modal-body">
-
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="importfile()">Import</button>
             </div>
         </div>
     </div>
@@ -54,13 +53,16 @@
 
 
 @section Scripts{
-    <script src="~/assets/vender/sweet-alert/sweetalert.min.js"></script>
+    @*<script src="~/assets/vender/sweet-alert/sweetalert.min.js"></script>*@
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script type="text/javascript">
         var page = '@ViewBag.page';
 
         $(function () {
-            ShowList('@Url.Action("_EVoucherList", "EVoucher")', '#eVoucherList');
+            ShowList('@Url.Action("_GetAllTransactions", "Transaction")', '#transactionList');
+
+            initComponents();
         });
 
         function ShowList(action, div) {
@@ -81,70 +83,69 @@
             })
         }
 
-        function ViewEvoucherDetail(e) {
-            $.ajax({
-                cache: false,
-                url: '@Url.Action("_ViewEVDetail", "EVoucher")',
-                data: { VoucherNo: e },
-                beforeSend: function () {
-                },
-                success: function (Data) {
-                    $("#formmodal").empty().append(Data);
-                },
-                complete: function () {
-                    $("#eVoucherDetailForm").modal('show');
+        function initComponents() {
+            $('#transactionList').on("click", ".pagedList a", function (e) {
+                e.preventDefault();
+                var $a = $(this).attr("href");
+                try {
+                    var pageurl = $a.split(/=/);
+                    page = pageurl[1];
+                    if (page == null) {
+                        page = 1;
+                    }
                 }
+                catch (e) {
+                    page = 1;
+                }
+                ShowList('@Url.Action("_GetAllTransactions", "Transaction")', '#transactionList');
             });
         }
 
+        function UploadModal() {
+            $("#uploadModal").modal('show');
+        }
 
-        function AddEVoucher() {
+        function importfile() {
+            var fileData = new FormData();
+            var files = $("#customFile").get(0).files;
+            var fileLength = files.length;
+            for (var i = 0; i < fileLength; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+
             $.ajax({
                 cache: false,
-                url: '@Url.Action("_UpserEVoucher", "EVoucher")',
+                type: "POST",
+                data: fileData,
+                processData: false,
+                contentType: false,
+                url: '@Url.Action("Upload", "Transaction")',
                 beforeSend: function () {
+                    $('.sub-btn').empty().append('Importing');
+                    $('.sub-btn').prop("disabled", true);
                 },
-                success: function (Data) {
-                    $("#formmodalNEW").empty().append(Data);
+                success: function (data) {
+                    switch (data) {
+                        case 'Success':
+                            $("#uploadModal").modal('hide');
+
+                            Swal.fire("Successfully!", "Successfully imported!", "success").then(function () {
+                                ShowList('@Url.Action("_GetAllTransactions", "Transaction")', '#transactionList');
+                            });
+                            break;
+                        case 'Error':
+                            Swal.fire("Error!", "Successfully imported!", "error");
+                            break;
+                        default:
+                            Swal.fire("Error!", data.map(obj => ('<p>' + obj + '</p>')), "error");
+                    }
                 },
                 complete: function () {
-                    $("#eVoucherUpSert").modal('show');
-
-                    $("#EVoucherNewForm").submit(function (e) {
-                        e.preventDefault();
-                        $.ajax({
-                            cache: false,
-                            url: '@Url.Action("_UpsertEV", "EVoucher")',
-                            type: "POST",
-                            data: $(this).serialize(),
-                            beforeSend: function () {
-                                $('#savebtn').empty().append('<span class="spinner-border"><i class="anticon anticon-loading"></i></span> Saving ...');
-                                $('#savebtn').prop("disabled", true);
-                            },
-                            success: function (myData) {
-                                if (myData == "Success") {
-                                    swal({
-                                        text: "Saved successfully.",
-                                        icon: "success"
-                                    });
-                                }
-                                else {
-                                    swal({
-                                        text: "Saving Fail.",
-                                        icon: "warning"
-                                    });
-                                }
-
-                                $("#eVoucherUpSert").modal('hide');
-                                ShowList('@Url.Action("_EVoucherList", "EVoucher")', '#eVoucherList');s
-                            },
-                            complete: function () {
-
-                            }
-                        });
-                    });
+                    $('.sub-btn').empty().append('Import');
+                    $('.sub-btn').prop("disabled", false);
                 }
             });
+
         }
 
     </script>

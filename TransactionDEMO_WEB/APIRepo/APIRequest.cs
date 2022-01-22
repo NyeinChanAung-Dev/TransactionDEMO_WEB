@@ -6,15 +6,15 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using TransactionDEMO_WEB.Models;
 
 namespace TransactionDEMO_WEB.APIRepo
 {
     public class APIRequest<T>
     {
         #region Base API
-        public const string APIKeyToCheck = "F0C1F3513D46B3A6AA5FAEF29315E68C";
-        private static string BaseUrl = "https://meekinapi.azurewebsites.net/";
-        //private static string BaseUrl = "https://localhost:44325/";
+        public const string APIKeyToCheck = "B93979A51C8C46712DD2C8271587B262";
+        private static string BaseUrl = "https://localhost:44387/";
 
         public static async Task<T> Get(string url)
         {
@@ -50,7 +50,7 @@ namespace TransactionDEMO_WEB.APIRepo
             }
         }
 
-        public static async Task<T> Post(string url, T entity)
+        public static async Task<List<Transaction>> Post(string url, List<Transaction> entity)
         {
             url = BaseUrl + url;
             using (var client = new HttpClient())
@@ -66,12 +66,12 @@ namespace TransactionDEMO_WEB.APIRepo
                         if (response.IsSuccessStatusCode)
                         {
                             var objsJsonString = await response.Content.ReadAsStringAsync();
-                            var jsonContent = JsonConvert.DeserializeObject<T>(objsJsonString);
+                            var jsonContent = JsonConvert.DeserializeObject<List<Transaction>>(objsJsonString);
                             return jsonContent;
                         }
                         else
                         {
-                            return default(T);
+                            return default(List<Transaction>);
                         }
                     }
                 }

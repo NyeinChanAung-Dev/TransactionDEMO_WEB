@@ -1,0 +1,60 @@
+﻿@model TransactionDEMO_WEB.Models.PagingModel<TransactionDEMO_WEB.Models.ResponseTransaction>
+@using X.PagedList.Mvc.Core;
+
+@if (Model.Results != null)
+{
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="bg-success">
+                <tr>
+                    <th scope="col" class="font-weight-bold">Invoice ID</th>
+                    <th scope="col" class="text-right font-weight-bold">Amount</th>
+                    <th scope="col" class="font-weight-bold">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Results)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td class="text-right">@item.Payment</td>
+                        <td>@item.Status</td>
+                    </tr>
+                 }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-5">
+        <nav>
+            <div class="pagedList">
+                @Html.PagedListPager(Model.Results, page => Url.Action("_GetAllTransactions", "Transaction",
+               new { page }), new X.PagedList.Web.Common.PagedListRenderOptions
+               {
+                   DisplayLinkToFirstPage = X.PagedList.Web.Common.PagedListDisplayMode.Always,
+                   DisplayLinkToLastPage = X.PagedList.Web.Common.PagedListDisplayMode.Always,
+                   DisplayLinkToPreviousPage = X.PagedList.Web.Common.PagedListDisplayMode.Always,
+                   DisplayLinkToNextPage = X.PagedList.Web.Common.PagedListDisplayMode.Always,
+                   MaximumPageNumbersToDisplay = 5,
+                   DisplayLinkToIndividualPages = true,
+                   UlElementClasses = new[] { "pagination justify-content-center" },
+                   LiElementClasses = new[] { "page-item" },
+                   PageClasses = new string[] { "page-link btn btn-icon btn-circle btn-sm border-0 btn-hover-info mr-2 my-1" },
+                   LinkToPreviousPageFormat = "<i class='ki ki-bold-arrow-back icon-xs'></i>",
+                   LinkToNextPageFormat = "<i class='ki ki-bold-arrow-next icon-xs'></i>"
+               })
+            </div>
+            <br />
+        </nav>
+    </div>
+    
+}
+else
+{
+    <div class="col-md-12 text-center">
+        <br />
+        <img src="~/assets/images/others/no data city app web.png" style="width:200px;height:200px;" />
+        <h4 class="text-bold">No Data Found.</h4>
+        <br />
+    </div>
+}
