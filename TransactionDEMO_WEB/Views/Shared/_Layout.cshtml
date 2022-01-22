@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Transaction Manager</title>
+
+    <!-- Core css -->
+    <link href="~/assets/css/app.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="app">
+        <div class="layout">
+            <!-- Header START -->
+            <div class="header" style="background: #a7e5f7 !important;">
+                <div class="logo logo-dark">
+                    <a asp-controller="Home" asp-action="Index" class="mt-3">
+                        <p class="font-weight-bold">Transaction Manager</p>
+                    </a>
+                </div>
+                <div class="nav-wrap">
+                    <ul class="nav-left">
+                        <li class="desktop-toggle">
+                            <a href="javascript:void(0);">
+                                <i class="anticon"></i>
+                            </a>
+                        </li>
+                        <li class="mobile-toggle">
+                            <a href="javascript:void(0);">
+                                <i class="anticon"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Header END -->
+            <!-- Side Nav START -->
+            <div class="side-nav">
+                <div class="side-nav-inner">
+                    <ul class="side-nav-menu scrollable">
+                        <li id="tranIndexPage" class="nav-item dropdown snavBar">
+                            <a asp-controller="Home" asp-action="Index" class="dropdown-toggle">
+                                <span class="icon-holder">
+                                    <i class="anticon anticon-appstore"></i>
+                                </span>
+                                <span class="title">Transaction</span>
+                                <span class="arrow"><i class="anticon font-size-10 anticon-right"></i></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Side Nav END -->
+            <!-- Page Container START -->
+            <div class="page-container">
+                <!-- Content Wrapper START -->
+                <div class="main-content">
+                    @RenderBody()
+                </div>
+                <!-- Content Wrapper END -->
+                <!-- Footer START -->
+                <footer class="footer">
+                    <div class="footer-content">
+                        <p class="m-b-0">Copyright © @DateTime.Now.Year - Transaction Manager.</p>
+                    </div>
+                </footer>
+                <!-- Footer END -->
+            </div>
+            <!-- Page Container END -->
+        </div>
+    </div>
+
+    <!-- Core Vendors JS -->
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/assets/js/vendors.min.js"></script>
+
+    <!-- Core JS -->
+    <script src="~/assets/js/app.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script type="text/javascript">
+        $(function () {
+            var page = '@ViewBag.pagename';
+            activateSideNav(page);
+        });
+
+        function activateSideNav(page) {
+            if (page != '') {
+                $('.snavBar').removeClass('sideNavActive');
+                $('#' + page).addClass('sideNavActive');
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+﻿
+@{ ViewData["Title"] = "Invoice"; }
+
+<div class="page-header">
+    <div class="m-t-10s">
+        <button class="btn btn-success btn-xs text-center rounded-pill m-r-5" onclick="AddEVoucher()">
+            <i class="anticon anticon-plus"></i> Create new EVoucher
+        </button>
+    </div>
+</div>
+
+<div class="container-fixed-sm" id="eVoucherList">
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="eVoucherDetailForm">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="avatar avatar-cyan avatar-icon avatar-square">
+                    <i class="anticon anticon-layout" style="font-size: 25px;"></i>
+                </div>
+                <h5 class="modal-title m-10" id="exampleModalLabel">EVoucher Detail</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="text-danger anticon anticon-close-circle"></i>
+                </button>
+            </div>
+            <div id="formmodal" class="modal-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="eVoucherUpSert">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="avatar avatar-cyan avatar-icon avatar-square">
+                    <i class="anticon anticon-layout" style="font-size: 25px;"></i>
+                </div>
+                <h5 class="modal-title m-10" id="exampleModalLabel">Create EVoucher New</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="text-danger anticon anticon-close-circle"></i>
+                </button>
+            </div>
+            <div id="formmodalNEW" class="modal-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/assets/vender/sweet-alert/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+        var page = '@ViewBag.page';
+
+        $(function () {
+            ShowList('@Url.Action("_EVoucherList", "EVoucher")', '#eVoucherList');
+        });
+
+        function ShowList(action, div) {
+            $.ajax({
+                cache: false,
+                url: action,
+                data: {
+                    page: page
+                },
+                beforeSend: function () {
+                    $(div).empty().append('<div id="load_screen" style="text-align: center;"><div style="width:100%;height:100%" class="loader"><div class="loader-content"><div class="spinner-grow" style="background-color: skyblue;"></div></div></div></div>');
+                },
+                success: function (myData) {
+                    $(div).empty().append(myData);
+                },
+                complete: function () {
+                }
+            })
+        }
+
+        function ViewEvoucherDetail(e) {
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("_ViewEVDetail", "EVoucher")',
+                data: { VoucherNo: e },
+                beforeSend: function () {
+                },
+                success: function (Data) {
+                    $("#formmodal").empty().append(Data);
+                },
+                complete: function () {
+                    $("#eVoucherDetailForm").modal('show');
+                }
+            });
+        }
+
+
+        function AddEVoucher() {
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("_UpserEVoucher", "EVoucher")',
+                beforeSend: function () {
+                },
+                success: function (Data) {
+                    $("#formmodalNEW").empty().append(Data);
+                },
+                complete: function () {
+                    $("#eVoucherUpSert").modal('show');
+
+                    $("#EVoucherNewForm").submit(function (e) {
+                        e.preventDefault();
+                        $.ajax({
+                            cache: false,
+                            url: '@Url.Action("_UpsertEV", "EVoucher")',
+                            type: "POST",
+                            data: $(this).serialize(),
+                            beforeSend: function () {
+                                $('#savebtn').empty().append('<span class="spinner-border"><i class="anticon anticon-loading"></i></span> Saving ...');
+                                $('#savebtn').prop("disabled", true);
+                            },
+                            success: function (myData) {
+                                if (myData == "Success") {
+                                    swal({
+                                        text: "Saved successfully.",
+                                        icon: "success"
+                                    });
+                                }
+                                else {
+                                    swal({
+                                        text: "Saving Fail.",
+                                        icon: "warning"
+                                    });
+                                }
+
+                                $("#eVoucherUpSert").modal('hide');
+                                ShowList('@Url.Action("_EVoucherList", "EVoucher")', '#eVoucherList');s
+                            },
+                            complete: function () {
+
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+    </script>
+}
+
