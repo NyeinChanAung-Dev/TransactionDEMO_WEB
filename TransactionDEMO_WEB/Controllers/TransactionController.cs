@@ -28,7 +28,7 @@ namespace TransactionDEMO_WEB.Controllers
 
             PagedListModel<ResponseTransaction> result = await APIRequest<PagedListModel<ResponseTransaction>>.Get(Url);
             var model = new PagingModel<ResponseTransaction>();
-            if (result.Results != null)
+            if (result != null)
             {
                 var pagedList = new StaticPagedList<ResponseTransaction>(result.Results, page, pageSize, result.TotalCount);
                 model.Results = pagedList;
