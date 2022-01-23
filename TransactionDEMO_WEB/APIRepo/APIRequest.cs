@@ -14,6 +14,7 @@ namespace TransactionDEMO_WEB.APIRepo
     {
         #region Base API
         public const string APIKeyToCheck = "G93979A51C8C46712DD2C8271587B262";
+        // TransactionDEMO_API url
         private static string BaseUrl = "https://localhost:44387/";
 
         public static async Task<T> Get(string url)

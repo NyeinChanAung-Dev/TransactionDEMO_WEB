@@ -135,7 +135,7 @@
                             });
                             break;
                         case 'Error':
-                            Swal.fire("Error!", "Successfully imported!", "error");
+                            Swal.fire("Error!", "Something worng!", "error");
                             break;
                         default:
                             Swal.fire("Error!", data.join("<br />"), "error");
@@ -144,6 +144,9 @@
                 complete: function () {
                     $('.sub-btn').empty().append('Import');
                     $('.sub-btn').prop("disabled", false);
+                },
+                error: function () {
+                    Swal.fire("Error!", "Something worng!", "error");
                 }
             });
 
