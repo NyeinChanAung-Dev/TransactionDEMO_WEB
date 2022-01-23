@@ -28,7 +28,7 @@ namespace TransactionDEMO_WEB.Controllers
 
             PagedListModel<ResponseTransaction> result = await APIRequest<PagedListModel<ResponseTransaction>>.Get(Url);
             var model = new PagingModel<ResponseTransaction>();
-            if (result.TotalCount > 0 && result.TotalPages > 0)
+            if (result.Results != null)
             {
                 var pagedList = new StaticPagedList<ResponseTransaction>(result.Results, page, pageSize, result.TotalCount);
                 model.Results = pagedList;
@@ -43,6 +43,12 @@ namespace TransactionDEMO_WEB.Controllers
             }
 
             return PartialView("_GetAllTransactions", model);
+        }
+
+        [HttpGet]
+        public IActionResult _UploadFormModal()
+        {
+            return PartialView("_UploadFormModal");
         }
 
         [HttpPost, DisableRequestSizeLimit]

@@ -26,23 +26,8 @@
                     <i class="text-danger anticon anticon-close-circle"></i>
                 </button>
             </div>
-            <div id="formmodal" class="modal-body">
-                <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Sample CSV file</label>
-                    <div class="col-sm-6 col-form-label">
-                        <a href="~/assets/sample/SampleCSV.csv">SampleCSV.csv</a>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Sample XML file</label>
-                    <div class="col-sm-6 col-form-label">
-                        <a target="_blank" href="~/assets/sample/SampleXML.xml">SampleXML.xml</a>
-                    </div>
-                </div>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="customFile">
-                    <label class="custom-file-label" for="customFile">Choose file</label>
-                </div>
+            <div id="uploadModal-Body" class="modal-body">
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="importfile()">Import</button>
@@ -102,7 +87,23 @@
         }
 
         function UploadModal() {
-            $("#uploadModal").modal('show');
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("_UploadFormModal", "Transaction")',
+                beforeSend: function () {
+                },
+                success: function (Data) {
+                    $("#uploadModal-Body").empty().append(Data);
+                },
+                complete: function () {
+                    $("#uploadModal").modal('show');
+
+                    $("#customFile").on("change", function () {
+                        var filename = $(this).val();
+                        $('#inputfilenameDisplay').empty().append(filename);
+                    });
+                }
+            });
         }
 
         function importfile() {
@@ -137,7 +138,7 @@
                             Swal.fire("Error!", "Successfully imported!", "error");
                             break;
                         default:
-                            Swal.fire("Error!", data.map(obj => ('<p>' + obj + '</p>')), "error");
+                            Swal.fire("Error!", data.join("<br />"), "error");
                     }
                 },
                 complete: function () {
